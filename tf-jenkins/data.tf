@@ -12,3 +12,8 @@ data "kubernetes_secret" "jenkins" {
   }
   depends_on = ["kubernetes_service_account.jenkins"]
 }
+data "kubernetes_secret" "datadog" {
+  metadata {
+    name = "datadog"
+  }
+}

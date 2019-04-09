@@ -52,6 +52,7 @@ resource "helm_release" "jenkins" {
     "${file("jenkins_values.yaml")}",
     "Master:\n  InitContainerEnv:\n    - name: CASC_VAULT_URL\n      value: \"${var.vault_url}\"\n    - name: CASC_VAULT_TOKEN\n      value: \"${var.vault_token}\"\n    - name: CASC_VAULT_PATHS\n      value: \"/secret/jenkins\"",
     "Master:\n  ContainerEnv:\n    - name: CASC_VAULT_URL\n      value: \"${var.vault_url}\"\n    - name: CASC_VAULT_TOKEN\n      value: \"${var.vault_token}\"\n    - name: CASC_VAULT_PATHS\n      value: \"/secret/jenkins\"",
+    "Master:\n  JCasC:\n    ConfigScripts:\n      datadog-config: |\n        unclassified:\n          datadogBuildListener:\n            apiKey: \"${lookup(data.kubernetes_secret.datadog.data, "api-key")}\""
   ]
   depends_on = ["vault_generic_secret.jenkins"]
 }
