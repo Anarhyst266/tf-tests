@@ -1,6 +1,3 @@
-variable "vault_url" {
-  type = "string"
-}
-variable "vault_token" {
+variable "vault_role_id" {
   type = "string"
 }
