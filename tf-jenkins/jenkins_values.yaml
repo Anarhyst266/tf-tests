@@ -20,6 +20,23 @@ Master:
   AdminUser: admin
   AdminPassword: admin
   RollingUpdate: {}
+  #  lifecycle:
+  customInitContainers:
+    - name: get-vault-token
+      image: "boostport/kubernetes-vault-init"
+      imagePullPolicy: Always
+      env:
+        - name: VAULT_ROLE_ID
+          value: "8c5f4fd5-0653-5705-422a-eeab277fd1d0"
+      volumeMounts:
+        - name: vault-token
+          mountPath: "/var/run/secrets/boostport.com"
+      volumes:
+        - name: vault-token
+          emptyDir: {}
+    - name: token-to-casc
+      image: "realguess/jq"
+      command: ["bash", "-c", "OBJ=$(cat /var/run/secrets/bootsport.com/vault-token);TOKEN=`echo $OBJ|jq .clientToken`;URL=`echo $OBJ|jq .vaultAddr`; echo \"CASC_VAULT_TOKEN=$TOKEN\" >> /var/jenkins_home/VAULT_FILE; echo \"CASC_VAULT_URL=$URL\">>/var/jenkins_home/VAULT_FILE"]
   # Ignored if Persistence is enabled
   # maxSurge: 1
   # maxUnavailable: 25%
@@ -154,8 +171,8 @@ Master:
   # etc.  Best reference is https://<jenkins_url>/configuration-as-code/reference.  The example below creates a welcome message:
   JCasC:
     enabled: true
-    PluginVersion: "1.10"
-    SupportPluginVersion: "1.10"
+    PluginVersion: 1.11
+    SupportPluginVersion: 1.11
     ConfigScripts:
       welcome-message: |
         jenkins:
@@ -233,8 +250,9 @@ Master:
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
   NodeSelector: {}
   Tolerations: {}
-  PodAnnotations: {}
-
+  PodAnnotations:
+    pod.boostport.com/vault-approle: jenkins
+    pod.boostport.com/vault-init-container: vault-token
   # The below two configuration-related values are deprecated and replaced by Jenkins Configuration as Code (see above
   # JCasC key).  They will be deleted in an upcoming version.
   CustomConfigMap: false

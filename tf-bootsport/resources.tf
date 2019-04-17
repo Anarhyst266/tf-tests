@@ -9,7 +9,7 @@ resource "helm_release" "kubernetes-vault" {
  }
  set {
   name = "configMap.vault.addr"
-  value = "http://${data.kubernetes_service.vault-server-vault.metadata.0.name}:8200"
+  value = "${var.vault_url}"
  }
  set {
   name = "configMap.vault.token"
