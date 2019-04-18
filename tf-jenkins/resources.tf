@@ -45,9 +45,9 @@ resource "vault_generic_secret" "jenkins" {
 
 resource "helm_release" "jenkins" {
   name = "jenkins"
-  repository = "${data.helm_repository.stable.metadata.0.name}"
+  repository = "${data.helm_repository.local.metadata.0.name}"
   chart = "jenkins"
-  version = "0.39.0"
+  version = "0.39.1"
 
   values = [
     "${file("jenkins_values.yaml")}",

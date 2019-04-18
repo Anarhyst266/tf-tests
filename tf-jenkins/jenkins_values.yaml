@@ -27,16 +27,20 @@ Master:
       imagePullPolicy: Always
       env:
         - name: VAULT_ROLE_ID
-          value: "8c5f4fd5-0653-5705-422a-eeab277fd1d0"
+          value: "d27e381c-7014-63f2-b454-6698c5c1348f"
       volumeMounts:
         - name: vault-token
-          mountPath: "/var/run/secrets/boostport.com"
-      volumes:
-        - name: vault-token
-          emptyDir: {}
+          mountPath: /var/run/secrets/boostport.com
+        - mountPath: /var/jenkins_home
+          name: jenkins-home
     - name: token-to-casc
       image: "realguess/jq"
-      command: ["bash", "-c", "OBJ=$(cat /var/run/secrets/bootsport.com/vault-token);TOKEN=`echo $OBJ|jq .clientToken`;URL=`echo $OBJ|jq .vaultAddr`; echo \"CASC_VAULT_TOKEN=$TOKEN\" >> /var/jenkins_home/VAULT_FILE; echo \"CASC_VAULT_URL=$URL\">>/var/jenkins_home/VAULT_FILE;echo \"CASC_VAULT_PATHS\"=\"/secrets/jenkins\""]
+      command: ["sh", "-c", "OBJ=$(cat /var/run/secrets/boostport.com/vault-token);TOKEN=`echo $OBJ|jq .clientToken|sed 's/\"//g'`;URL=`echo $OBJ|jq .vaultAddr|sed 's/\"//g'`; echo \"CASC_VAULT_TOKEN=$TOKEN\" >> /var/jenkins_home/VAULT_FILE; echo \"CASC_VAULT_URL=$URL\">>/var/jenkins_home/VAULT_FILE;echo \"CASC_VAULT_PATHS\"=\"/secret/jenkins\" >> /var/jenkins_home/VAULT_FILE"]
+      volumeMounts:
+        - name: vault-token
+          mountPath: /var/run/secrets/boostport.com
+        - mountPath: /var/jenkins_home
+          name: jenkins-home
   # Ignored if Persistence is enabled
   # maxSurge: 1
   # maxUnavailable: 25%
@@ -54,7 +58,7 @@ Master:
   # JavaOpts: "-Xms512m -Xmx512m"
   # JenkinsOpts: ""
   # JenkinsUrl: ""
-  # If you set this prefix and use ingress controller then you might want to set the ingress path below
+ # If you set this prefix and use ingress controller then you might want to set the ingress path below
   # JenkinsUriPrefix: "/jenkins"
   # Enable pod security context (must be `true` if RunAsUser or FsGroup are set)
   UsePodSecurityContext: true
@@ -252,7 +256,7 @@ Master:
   Tolerations: {}
   PodAnnotations:
     pod.boostport.com/vault-approle: jenkins
-    pod.boostport.com/vault-init-container: vault-token
+    pod.boostport.com/vault-init-container: get-vault-token
   # The below two configuration-related values are deprecated and replaced by Jenkins Configuration as Code (see above
   # JCasC key).  They will be deleted in an upcoming version.
   CustomConfigMap: false
@@ -359,6 +363,8 @@ Persistence:
   AccessMode: ReadWriteOnce
   Size: 8Gi
   volumes:
+    - name: vault-token
+      emptyDir: {}
   #  - name: nothing
   #    emptyDir: {}
   mounts:

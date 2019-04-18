@@ -7,3 +7,6 @@ path "intermediate-ca/issue/kubernetes-vault" {
 path "auth/token/roles/kubernetes-vault" {
   capabilities = ["read"]
 }
+path "/secret/jenkins" {
+  capabilities = ["read"]
+}
