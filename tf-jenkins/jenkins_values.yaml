@@ -36,7 +36,7 @@ Master:
           emptyDir: {}
     - name: token-to-casc
       image: "realguess/jq"
-      command: ["bash", "-c", "OBJ=$(cat /var/run/secrets/bootsport.com/vault-token);TOKEN=`echo $OBJ|jq .clientToken`;URL=`echo $OBJ|jq .vaultAddr`; echo \"CASC_VAULT_TOKEN=$TOKEN\" >> /var/jenkins_home/VAULT_FILE; echo \"CASC_VAULT_URL=$URL\">>/var/jenkins_home/VAULT_FILE"]
+      command: ["bash", "-c", "OBJ=$(cat /var/run/secrets/bootsport.com/vault-token);TOKEN=`echo $OBJ|jq .clientToken`;URL=`echo $OBJ|jq .vaultAddr`; echo \"CASC_VAULT_TOKEN=$TOKEN\" >> /var/jenkins_home/VAULT_FILE; echo \"CASC_VAULT_URL=$URL\">>/var/jenkins_home/VAULT_FILE;echo \"CASC_VAULT_PATHS\"=\"/secrets/jenkins\""]
   # Ignored if Persistence is enabled
   # maxSurge: 1
   # maxUnavailable: 25%
